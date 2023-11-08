@@ -1,0 +1,159 @@
+---
+title: "Lista 01"
+author: "Lucas Fonseca Alves"
+date: "24 de setembro, 2023"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r echo= TRUE}
+library(tidyverse)
+```
+
+# Questão 1
+
+Peça ao ChatGPT gerar um texto de 4 parágrafos sobre um tema de sua
+escolha. Copie o texto gerado e salve no objeto “texto” (utilize \\n para quebra
+de linha). Em seguida, faça o que se pede utilizando o pacote stringr.
+
+```{r}
+texto <- "A inteligência artificial (IA) tem sido um dos campos mais empolgantes e inovadores da ciência da computação nas últimas décadas. Ela se concentra no desenvolvimento de sistemas e algoritmos que podem executar tarefas que normalmente requerem inteligência humana. A IA tem uma ampla gama de aplicações, desde assistentes virtuais e carros autônomos até diagnóstico médico avançado e análise de dados em larga escala.
+Uma das áreas mais promissoras da IA é o aprendizado de máquina, onde os algoritmos são treinados para reconhecer padrões e fazer previsões com base em dados. Essa capacidade de aprendizado permite que os sistemas de IA melhorem continuamente com o tempo, tornando-os cada vez mais eficientes e precisos em suas tarefas. À medida que a IA se torna mais sofisticada, ela desafia as fronteiras do que é possível realizar com a tecnologia.
+No entanto, com o poder da IA também vêm questões éticas e preocupações sobre o seu impacto na sociedade. A automação de empregos, a privacidade dos dados e o viés algorítmico são apenas algumas das questões que precisam ser abordadas à medida que a IA se torna mais difundida. É essencial que desenvolvamos políticas e regulamentações adequadas para garantir que a IA seja usada para o bem da humanidade.
+Em resumo, a inteligência artificial é uma área emocionante e em constante evolução que promete transformar a maneira como vivemos e trabalhamos. À medida que continuamos a explorar e desenvolver essa tecnologia, é fundamental equilibrar o potencial de inovação com uma consideração cuidadosa de suas implicações éticas e sociais."
+
+texto <- str_c(texto, collapse = "\\n")
+
+texto
+
+```
+
+
+A) Conte quantas sentenças existem no texto.
+
+Utilizarei o ponto final como separador de sentenças.
+
+```{r}
+str_count(texto, pattern = "\\." )
+
+```
+B) Remova todos os sinais de pontuação e quebras de linha do texto.
+
+```{r}
+
+str_replace_all(texto, "[[:punct:]\\n]", "")
+
+
+```
+C) Separe os parágrafos do texto criado (cada parágrafo ocupa um elemento de um vetor). Em seguida, remova espaços em branco do início e fim de cada objeto.
+
+```{r}
+texto %>% 
+  str_split("\\n")%>% 
+  unlist() %>% 
+  str_trim
+
+
+```
+D) Encontre no texto todas as palavras que contenham mais de 3 caracteres
+
+```{r}
+#Vetor
+texto %>% 
+  str_extract_all("\\b\\w{4,}\\b", simplify = TRUE)
+
+
+#Lista
+texto %>% 
+  str_extract_all("\\b\\w{4,}\\b")
+
+```
+
+E) Encontre as top 6 palavras mais citadas no texto (que contenham mais de 3
+caracteres)
+
+```{r}
+#Extraindo todas as palavras com mais de 3 palavras e colocando em um vetor
+palavras <-  str_extract_all(texto, "\\b\\w{4,}\\b") %>% 
+  unlist() 
+
+#Colocando o vetor no data frame
+palavras_df <- data.frame(Palavras = str_to_lower(palavras), stringsAsFactors = F)
+
+#Contando as palavras e mostrando as 6 primeiras que aparecem
+palavras_df %>% 
+  group_by(Palavras) %>% 
+  summarise(Frequencia = n()) %>% 
+  arrange(desc(Frequencia)) %>% 
+  head()
+
+
+#Forma 2 
+
+words4 = texto %>% 
+  table() %>% 
+  as.data.frame() %>% 
+  arrange(desc(Freq)) %>% 
+  head()
+
+
+```
+
+
+# Questão 2
+
+Carregue o banco de dados imdb.csv que contém informações sobre filmes e responda os itens a seguir.
+
+```{r}
+filme <- read_csv("imdb.csv")
+```
+
+A) Qual é a proporção de filmes com orçamento igual ou maior do que 10 milhões?
+
+```{r}
+filmes_maiores_10mi <- filme %>% 
+  filter(!is.na(orcamento),orcamento >= 10000000) %>% 
+  summarise(Frequencia = n())
+
+prop_orc_10mi <- filme %>% 
+  filter(!is.na(orcamento)) %>% 
+  summarise(frequencia = n(), proporção = round((filmes_maiores_10mi/frequencia)*100, 2))
+
+print(prop_orc_10mi$proporção)
+
+#Gabarito
+filme %>%
+  filter(!is.na(orcamento)) %>% 
+  mutate(ind_orcamento = orcamento >= 10000000) %>% 
+  summarise(mean(ind_orcamento))
+  
+
+```
+
+B) Liste os filmes que apresentam a variável id_filme com mais de 9 caracteres?
+
+```{r}
+ filme %>% 
+  filter(str_count(id_filme)>9)
+
+```
+
+C) Acrescente 1 variável CATEGÓRICA no banco de dados chamada “classificacao_nota” informando o primeiro dígito da nota_imdb.
+
+```{r}
+
+filme %>% 
+  mutate(classificacao_nota = str_sub(nota_imdb,1,1)) %>% 
+  select(nota_imdb, classificacao_nota, everything())
+  
+```
+
+D) Escolha o nome de 1 ator do elenco e retorne todos os filmes que este ator atuou
+
+```{r}
+filme %>% 
+  filter(str_detect(elenco, "William Hurt")) %>% 
+  select(elenco, titulo, generos, everything())
+```
+

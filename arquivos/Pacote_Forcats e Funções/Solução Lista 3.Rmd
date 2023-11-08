@@ -1,0 +1,171 @@
+---
+title: "Solução Lista 3"
+author: "Lucas Fonseca Alves"
+date: "2023-11-06"
+output: html_document
+---
+Funções exponenciais são conhecidas por crescerem, e crescerem rápido!
+Suponha que você tenha uma folha de papel; cujas dimensões não são relevantes à excessão da altura, que iremos considerar como 0,0001 metro (aproximadamente a altura de uma folha de papel A4). 
+Ao dobrar 1 vez essa folha, a nova altura do papel dobrado será o dobro da anterior, ou seja,
+2 × 0, 0001 metro = 0, 0002 metro. Depois, ao dobrá-la novamente, sua nova altura será de 2 × 0, 0002 
+metro = 0, 0004 metro, e assim por diante. Dessa forma, responda as questões a seguir
+
+
+a) Construa uma função que receba um número k inteiro representando o
+número de dobras na folha de papel que o usuário deseja fazer. A função deve
+retornar como resposta a altura da folha de papel após as k dobras. Considere
+a altura para k = 0 como 0, 0001 metro (ou seja, considere a possibilidade do
+input k=0 e sua respectiva resposta). Teste sua função com alguns exemplos.
+
+```{r}
+dobra <- function (k){
+ 
+ 
+return(format(0.0001 * 2^k, scientific = FALSE))
+  
+}
+
+
+dobra(5)
+
+```
+
+b) Complemente sua função, tornando impossível o mal uso da função. Por
+exemplo, caso o usuário entre com um input não numérico, peça para retornar
+uma mensagem de erro. Caso o usuário entre com um número não inteiro ou
+um número negativo, ela também deve retornar mensagens de erro escritas
+por você. Teste sua função com alguns exemplos.
+
+
+```{r}
+
+dobra <- function (k){
+ 
+ if(!is.numeric(k) || k != round(k) || k <= 0 ){
+   warning("A função aceita apenas valores maiores que zero, inteiros e não númericos. Confira o valor de entrada!")
+ }else{
+   return(format(0.0001 * 2^k, scientific = FALSE))
+
+ }
+  
+}
+
+```
+
+```{r}
+dobra("a")
+```
+```{r}
+dobra(0.5)
+```
+```{r}
+dobra(-1)
+```
+```{r}
+dobra(2)
+```
+
+c) Complemente sua função da letra “b” para retornar como resposta 3
+elementos: o número k de dobras do papel, a altura final do papel e a seguinte
+mensagem “Altura do papel após xxx dobras foi de xxx metros”. Teste sua
+função com alguns exemplos
+
+```{r}
+
+dobra <- function(k) {
+  if (!is.numeric(k) || k != round(k) || k <= 0) {
+    warning("A função aceita apenas valores inteiros positivos. Confira o valor de entrada.")
+  } else {
+    altura_final <- format(0.0001 * 2^k, scientific = FALSE)
+    mensagem <- paste(k,altura_final, paste("Altura do papel após", k, "dobras foi de", altura_final, "metros."))
+    return(mensagem)
+  }
+}
+
+
+dobra(2)
+
+```
+
+
+d) Acrescente como input da sua função as seguintes variáveis: altura da
+folha de papel e unidade de medida (metros ou centímetros) do resultado
+apresentado. Dessa forma, o usuário poderá escolher a unidade de medida e a
+altura da folha de papel. Teste sua função com alguns exemplos.
+
+```{r}
+
+dobra <- function(k, altura, unidade_medida) {
+  if (!is.numeric(k) || k != round(k) || k <= 0) {
+    warning("A função aceita apenas valores inteiros positivos. Confira o valor de entrada.")
+  } else {
+    if(unidade_medida == "m"){
+      altura_final <- format(altura * 2^k, scientific = FALSE)
+      mensagem <- paste(k,
+                      altura_final, 
+                      paste("Altura do papel após", k, "dobras foi de", altura_final, "metros."))
+    }
+    if(unidade_medida == "cm"){
+      altura_final <- format((altura * 2^k)*100, scientific = FALSE)
+      mensagem <- paste(k,
+                      altura_final, 
+                      paste("Altura do papel após", k, "dobras foi de", altura_final, "centímetros."))
+    }
+    
+    
+    return(mensagem)
+  }
+}
+
+
+dobra(k = 2, altura = 0.0001, unidade_medida = "cm")
+dobra(k = 2, altura = 0.0001, unidade_medida = "m")
+
+
+```
+
+e) Utilize a função elaborada na letra “b” para complementar conforme
+solicitado a seguir. Sabendo que a distância de Brasília à Goiânia é de 203000
+metros, a circunferência da terra mede 40075000 metros e a distância da lua
+da terra é de 384400000 metros, peça para a função retornar a mensagem “O
+papel é maior que a distância de Brasília à Goiânia”, caso a altura seja igual
+ou superior à 203000 metros; “O papel é maior que a circunferência da terra!”,
+caso a altura seja igual ou superior a medida da circunferência da terra; e “O
+papel chegou a lua!”, caso a altura do papel seja igual ou superior a distância
+da lua da terra. Com qual valor de k você atingiu tais grandezas? Teste sua
+função com alguns exemplos.
+
+
+```{r}
+
+dobra <- function (k){
+ 
+ if(!is.numeric(k) || k != round(k) || k <= 0 ){
+   stop("A função aceita apenas valores maiores que zero, inteiros e não númericos. Confira o valor de entrada!")
+ }
+   papel <- 0.0001 * 2^k
+   mensagem <-""
+   
+   if(papel >= 203000){
+     mensagem <-"O papel é maior que a distância de Brasília à Goiânia"
+   }
+   if(papel >= 40075000){
+     mensagem <-"O papel é maior que a circunferência da terra!"
+   }
+   if(papel >= 384400000){
+     mensagem <-"O papel chegou a lua!"
+   }
+   
+     return(mensagem)
+
+}
+  
+  
+
+dobra(32)
+dobra(40)
+dobra(100000)
+
+```
+
+
